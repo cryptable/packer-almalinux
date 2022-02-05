@@ -205,7 +205,7 @@ build {
     ]
     only = [ 
       "vmware-iso.almalinux", 
-      "source.vmware-iso.almalinux" 
+      "proxmox-iso.almalinux" 
     ]
   }
 
