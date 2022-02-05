@@ -13,20 +13,23 @@ Setup
 
 You can build them using command:
 ```
-./build.sh <domain> <proxmox|vmware>
+./build.sh <domain> <proxmox|vmware|vagrant>
 ```
 
 It will concatenate to the template in the image-configs directory:
 
-- <domain>-<vm-technolofy>.shvars : settings to create the cloud-init user-date file
-- <domain>-<vm-technolofy>.pkrvars.hcl: settings to build the images
+- <domain>-<vm-technology>.shvars : settings to create the cloud-init user-date file
+- <domain>-<vm-technology>.pkrvars.hcl: settings to build the images
+
+Vagrant will try to deploy on the Vagrant Cloud.
 
 DANGER: 
 Don't use the default .shvars-file, because it is just an example. It is better to reconfigure the file or use a Vault system to retrieve the credentials.
+The SSH key is a dummy key and usable for you.
 
 TODO
 ----
-- Testing on VMWare
+
 
 Notes
 -----

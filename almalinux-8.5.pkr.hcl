@@ -101,6 +101,19 @@ variable "hostname" {
   default = "alma"
 }
 
+# Vagrant Section
+# ---------------
+
+variable "vagrant_token" {
+  type    = string
+  default = "<Atlas token>"
+}
+
+variable "vagrant_version" {
+  type    = string
+  default = "0.0.0"
+}
+
 # VMWARE image section
 # --------------------
 
@@ -167,10 +180,15 @@ source "proxmox-iso" "almalinux" {
   template_description = "Alma Linux 8.5 template to build Alma Linux server"
 }
 
+source "null" "vagrant" {
+  communicator = "none"
+}
+
 build {
   sources = [
     "source.proxmox-iso.almalinux",
-    "source.vmware-iso.almalinux"
+    "source.vmware-iso.almalinux",
+    "source.null.vagrant"
   ]
 
   provisioner "shell" {
@@ -185,5 +203,56 @@ build {
       "./scripts/cleanup.sh",
       "./scripts/harden.sh",
     ]
+    only = [ 
+      "vmware-iso.almalinux", 
+      "source.vmware-iso.almalinux" 
+    ]
   }
+
+  post-processors {  
+    post-processor "artifice" {
+      files = [
+        "output-vmware/disk-s001.vmdk",
+        "output-vmware/disk-s002.vmdk",
+        "output-vmware/disk-s003.vmdk",
+        "output-vmware/disk.vmdk",
+        "output-vmware/alma-template.nvram",
+        "output-vmware/alma-template.vmsd",
+        "output-vmware/alma-template.vmx",
+        "output-vmware/alma-template.vmxf"
+      ]
+      only = [ 
+        "vmware-iso.almalinux", 
+        "null.vagrant" 
+      ]
+    }
+    post-processor "vagrant" {
+      keep_input_artifact = true
+      provider_override   = "vmware"
+      output = "output-vmware/packer_alma_vmware.box"
+      only = [ 
+        "vmware-iso.almalinux", 
+        "null.vagrant" 
+      ]
+    }
+  }
+  post-processors {  
+    post-processor "artifice" {
+      files = [
+        "output-vmware/packer_alma_vmware.box"
+      ]
+      only = [ 
+        "null.vagrant"
+      ]
+    }
+    post-processor "vagrant-cloud" {
+      access_token = "${var.vagrant_token}"
+      box_tag      = "cryptable/alma85"
+      version      = "${var.vagrant_version}"
+      version_description = "Empty Alma Linux"
+      only = [ 
+        "null.vagrant"
+      ]
+    }
+  } 
 }
