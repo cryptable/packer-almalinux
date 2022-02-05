@@ -1,7 +1,7 @@
 # VM Section
 # ----------
 
-vm_name = "ubuntu-template"
+vm_name = "alma-template"
 
 # Proxmox Section
 # ---------------

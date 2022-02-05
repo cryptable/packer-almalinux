@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cat <<EOF > ./http/vmware/linux/alma/8.5/almalinux.ks
-## AlmaLinux 8.5 kickstart file with Vagrant support
+## AlmaLinux 8.5 kickstart file with VMware support
 
 url --url https://repo.almalinux.org/almalinux/8.5/BaseOS/x86_64/kickstart/
 repo --name=BaseOS --baseurl=https://repo.almalinux.org/almalinux/8.5/BaseOS/x86_64/os/
@@ -12,7 +12,7 @@ skipx
 firstboot --disabled
 
 lang en_US.UTF-8
-keyboard us
+keyboard be
 timezone UTC --isUtc
 
 network --bootproto=dhcp --hostname=${HOSTNAME}
@@ -25,8 +25,8 @@ zerombr
 clearpart --all --initlabel
 autopart --type=plain --nohome --noboot
 
-rootpw ${PASSWORD}
-user --name=${USERNAME} --plaintext --password ${PASSWORD}
+rootpw "${PASSWORD}"
+user --name="${USERNAME}" --plaintext --password "${PASSWORD}"
 
 reboot --eject
 
@@ -34,6 +34,7 @@ reboot --eject
 %packages --ignoremissing --excludedocs --instLangs=en_US.UTF-8
 bzip2
 tar
+qemu-guest-agent
 -microcode_ctl
 -iwl*-firmware
 %end
@@ -45,9 +46,9 @@ tar
 
 
 %post
-sed -i 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD:ALL/g' /etc/sudoers
-echo 'Defaults:${USERNAME} !requiretty' > /target/etc/sudoers.d/${USERNAME}
-echo '${USERNAME} ALL=(ALL) NOPASSWD: ALL' >> /target/etc/sudoers.d/${USERNAME}
+sed -i "s/^.*requiretty/# Defaults requiretty/" /etc/sudoers
+echo 'Defaults:${USERNAME} !requiretty' > /etc/sudoers.d/${USERNAME}
+echo '${USERNAME} ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/${USERNAME}
 chmod 440 /target/etc/sudoers.d/${USERNAME}
 restorecon -R /home/${USERNAME}
 %end

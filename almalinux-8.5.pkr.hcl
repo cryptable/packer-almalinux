@@ -116,7 +116,7 @@ source "vmware-iso" "almalinux" {
   iso_checksum         = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url              = "${var.iso_url}"
   memory               = "${var.ram_size}"
-  shutdown_command     = "echo 'vagrant' | sudo -S -E shutdown -P now"
+  shutdown_command     = "echo '${var.password}' | sudo -S -E shutdown -P now"
   ssh_timeout          = "10m"
   ssh_username         = "${var.username}"
   ssh_password         = "${var.password}"
@@ -169,7 +169,8 @@ source "proxmox-iso" "almalinux" {
 
 build {
   sources = [
-    "source.proxmox-iso.almalinux"
+    "source.proxmox-iso.almalinux",
+    "source.vmware-iso.almalinux"
   ]
 
   provisioner "shell" {
